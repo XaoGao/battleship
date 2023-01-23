@@ -1,3 +1,4 @@
+"cell.st"
 Object subclass: Cell [
   | x y type|
   <comment: 'Represent a cell in board'>
