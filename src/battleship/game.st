@@ -10,7 +10,7 @@ Object subclass: Game [
   init [
     <category: 'initialization'>
     FileStream fileIn: 'src/battleship/board.st'.
-    board := Board new: 10 row:10.
+    board := Board new: 10 row: 10.
   ]
 
   start [
