@@ -14,7 +14,6 @@ Object subclass: Game [
   ]
 
   start [
-    board draw.
     board placeShips.
     board draw.
   ]

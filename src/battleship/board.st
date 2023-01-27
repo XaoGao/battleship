@@ -20,15 +20,7 @@ Object subclass: Board [
     row := aRow.
     printer := ConsolePrinter new.
 
-    map := Array new: row.
-    1 to: col do: [:i|
-      map at: i put: (Array new: col).
-    ].
-    1 to: col do: [:i |
-      1 to: row do: [:j |
-        (map at: i) at: j put: (EmptyCell new: i y: j).
-      ].
-    ].
+    map := self initMap.
   ]
 
   draw [
@@ -41,14 +33,27 @@ Object subclass: Board [
     (map at: aX) at: aY put: (HitCell new: aX y: aY)
   ]
 
-  placeShip: cell [
-    <category: 'Convert type to ship'>
-    (map at: (cell x)) at: (cell y) put: (ShipCell new: (cell x) y: (cell y))
+  placeShip: cell direction: aDirection size: aSize [
+    | x y |
+    <category: 'Convert cells type to ship'>
+    x := cell x.
+    y := cell y.
+    (aDirection = 'hor')
+      ifTrue: [
+        x to: ((x + aSize) - 1) do: [:i|
+          (map at: i) at: y put: (ShipCell new: i y: y)
+        ].
+      ]
+      ifFalse: [
+        y to: ((y + aSize) - 1) do: [:i|
+          (map at: x) at: i put: (ShipCell new: x y: i)
+        ].
+      ]
   ]
 
   placeShips [
     | direction startCell shipIsPlaced |
-    <category: 'Place ships to map'>
+    <category: 'Find place to ships in map'>
     #(1 1 1 1 2 2 2 3 3 4) do: [:ship |
       shipIsPlaced := False.
       direction := self randomDirection.
@@ -56,14 +61,14 @@ Object subclass: Board [
         startCell := self randomStartElement.
         (startCell isEmpty)
           ifTrue: [
-            ((direction = 'hor') & (col - (startCell x) >= ship))
+            ((direction = 'hor') & ((row - (startCell x)) > ship) & ((self notAnyShipHor: (startCell x) y: (startCell y) size: ship)))
               ifTrue: [
-                self placeShip: startCell.
+                self placeShip: startCell direction: 'hor' size: ship.
                 shipIsPlaced := True.
               ].
-            ((direction = 'ver') & (row - (startCell y) >= ship))
+            ((direction = 'ver') & ((col - (startCell y)) > ship) & ((self notAnyShipVer: (startCell x) y: (startCell y) size: ship)))
               ifTrue: [
-                self placeShip: startCell.
+                self placeShip: startCell direction: 'ver' size: ship.
                 shipIsPlaced := True.
               ].
           ]
@@ -83,5 +88,50 @@ Object subclass: Board [
     startY := Random between: 1 and: row.
     startEl := (map at: startX) at: startY.
     ^startEl
+  ]
+
+  notAnyShipHor: startX y: startY size: shipSize [
+    <category: 'Check cells is alrady shiped in horizont'>
+    | nextCell |
+    ((startX + shipSize) > col)
+      ifTrue: [^true].
+    startX to: ((startX + shipSize) - 1) do: [:i|
+      nextCell := (map at: startY) at: i.
+      (nextCell isShip = True)
+        ifTrue: [
+          ^false.
+        ].
+    ].
+    ^true.
+  ]
+
+  notAnyShipVer: startX y: startY size: shipSize [
+    <category: 'Check cells is alrady shiped in vertical'>
+    | nextCell |
+    ((startY + shipSize) > row)
+      ifTrue: [^true].
+    startY to: ((startY + shipSize) - 1) do: [:i|
+      nextCell := (map at: startX) at: i.
+      (nextCell isShip = True)
+        ifTrue: [
+          ^false.
+        ].
+    ].
+    ^true.
+  ]
+
+  initMap [
+    <category: 'Init a 2d array for map'>
+    | x |
+    x := Array new: row.
+    1 to: col do: [:i|
+      x at: i put: (Array new: col).
+    ].
+    1 to: col do: [:i |
+      1 to: row do: [:j |
+        (x at: i) at: j put: (EmptyCell new: i y: j).
+      ].
+    ].
+    ^x
   ]
 ]
