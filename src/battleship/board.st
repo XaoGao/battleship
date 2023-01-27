@@ -41,30 +41,29 @@ Object subclass: Board [
     (map at: aX) at: aY put: (HitCell new: aX y: aY)
   ]
 
-  planeShip: aX y: aY [
+  placeShip: cell [
     <category: 'Convert type to ship'>
-    (map at: aX) at: aY put: (ShipCell new: aX y: aY)
+    (map at: (cell x)) at: (cell y) put: (ShipCell new: (cell x) y: (cell y))
   ]
 
   placeShips [
-    | direction startEl shipIsPlaced |
+    | direction startCell shipIsPlaced |
     <category: 'Place ships to map'>
     #(1 1 1 1 2 2 2 3 3 4) do: [:ship |
       shipIsPlaced := False.
       direction := self randomDirection.
       [shipIsPlaced = True] whileFalse: [
-        startEl := self randomStartElement.
-        placeShip: startEl.
-        (startEl isEmpty)
+        startCell := self randomStartElement.
+        (startCell isEmpty)
           ifTrue: [
-            ((direction = 'hor') & (col - (startEl x) >= ship))
+            ((direction = 'hor') & (col - (startCell x) >= ship))
               ifTrue: [
-                (map at: (startEl x)) at: (startEl y) put: (ShipCell new: (startEl x) y: (startEl y)).
+                self placeShip: startCell.
                 shipIsPlaced := True.
               ].
-            ((direction = 'ver') & (row - (startEl y) >= ship))
+            ((direction = 'ver') & (row - (startCell y) >= ship))
               ifTrue: [
-                (map at: (startEl x)) at: (startEl y) put: (ShipCell new: (startEl x) y: (startEl y)).
+                self placeShip: startCell.
                 shipIsPlaced := True.
               ].
           ]
