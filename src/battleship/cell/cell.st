@@ -21,14 +21,20 @@ Object subclass: Cell [
   ]
 
   isHit [
-    type = 'hit'
+    ^type = 'hit'
   ]
 
   isEmpty [
-    type = 'empty'
+    ^type = 'empty'
   ]
 
   isShip [
-    type = 'ship'
+    ^type = 'ship'
+  ]
+  x [
+    ^x
+  ]
+  y [
+    ^y
   ]
 ]
